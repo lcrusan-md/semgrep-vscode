@@ -1,8 +1,8 @@
 {
-  "name": "semgrep",
-  "displayName": "Semgrep",
-  "description": "Security scans in a snap. Speedy SAST with a powerful rule registry for seamless detection and remediation of code vulnerabilities with each save.",
-  "version": "1.17.0",
+  "name": "semgrep-patched",
+  "displayName": "Semgrep (patched, mdthink-appsec)",
+  "description": "Security scans in a snap. Speedy SAST with a powerful rule registry for seamless detection and remediation of code vulnerabilities with each save. Locally patched to fix scan.configuration being silently discarded by the legacy LSP server's strict settings parser -- see NOTICE-LGPL.md.",
+  "version": "1.17.2",
   "engines": {
     "vscode": "^1.86.0"
   },
@@ -19,8 +19,8 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "publisher": "Semgrep",
-  "repository": "https://github.com/semgrep/semgrep-vscode",
+  "publisher": "mdthink-appsec",
+  "repository": "https://github.com/lcrusan-md/semgrep-vscode",
   "icon": "semgrep-icon.png",
   "galleryBanner": {
     "color": "#ffffff",
@@ -283,7 +283,8 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "vscode:prepublish": "npm run esbuild-extension-only",
+    "esbuild-extension-only": "node -e \"require('esbuild').buildSync({entryPoints:['./src/extension.ts'],outfile:'./out/main.js',bundle:true,platform:'node',format:'cjs',external:['vscode'],minify:true})\"",
     "esbuild-base": "node ./build.mjs",
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "watch:esbuild": "npm run esbuild-base -- --sourcemap --watch",

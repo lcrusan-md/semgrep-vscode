@@ -179,6 +179,18 @@ async function lspOptions(
   const initializationOptions = {
     ...env.config.cfg,
   };
+  // The legacy LSP server parses this `scan` object with ppx_deriving_yojson in strict
+  // mode (semgrep/semgrep src/lsp_legacy/server/Legacy_user_settings.ml), which rejects
+  // the WHOLE object if it carries any key the record doesn't declare -- and
+  // Legacy_initialize_request.ml swallows that error, silently falling back to defaults
+  // where `configuration` is empty. VS Code materializes `scan.secrets` from its schema
+  // default even when unset, so this always trips, discarding the user's
+  // scan.configuration and forcing a fallback to the "auto" registry pack.
+  if (initializationOptions.scan) {
+    const scan = { ...initializationOptions.scan };
+    delete scan.secrets;
+    initializationOptions.scan = scan;
+  }
   initializationOptions.metrics = metrics;
 
   env.logger.log(
