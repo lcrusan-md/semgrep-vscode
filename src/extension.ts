@@ -108,7 +108,15 @@ async function afterClientStart(context: ExtensionContext, env: Environment) {
         }
       }
     });
-  vscode.commands.executeCommand("semgrep.mcpSetup");
+  // PATCHED (fork): upstream fires `semgrep.mcpSetup` here, which nudges the user to wire
+  // the hosted https://mcp.semgrep.ai remote MCP server into the open repository. This
+  // build is distributed by appsec-ide-toolkit, whose stated guarantee is that no code
+  // leaves the developer's machine, so the prompt is removed rather than left to depend on
+  // the user declining it. The nudge is gated on `vscode.env.uriScheme === "cursor"`, so it
+  // is already inert in plain VS Code -- this only matters for developers using Cursor.
+  // The `semgrep.mcpSetup` command itself is left registered in commands.ts, so it can
+  // still be invoked deliberately. See PATCHES.md.
+  // vscode.commands.executeCommand("semgrep.mcpSetup");
 }
 
 // Automatically invoked by VS Code's extension API
